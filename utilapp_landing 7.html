@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UtilApp — Protezione silenziosa</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black:   #000000;
+  --bg:      #050508;
+  --purple:  #a371f7;
+  --purple2: #7c3aed;
+  --purple3: #6d28d9;
+  --white:   #ffffff;
+  --gray:    #6b7280;
+  --gray2:   #9ca3af;
+  --border:  rgba(163,113,247,0.15);
+  --card:    rgba(255,255,255,0.03);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0 40px; height: 64px;
+  background: rgba(5,5,8,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 0.5px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; font-size: 17px;
+  color: var(--white);
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--purple);
+  animation: blink 2.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+.nav-cta {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 500;
+  color: var(--purple);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav-cta:hover { background: rgba(163,113,247,0.08); border-color: var(--purple); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 100px 24px 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* glow sfondo */
+.hero-glow {
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.hero-glow2 {
+  position: absolute;
+  width: 400px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(163,113,247,0.07) 0%, transparent 70%);
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-content { position: relative; z-index: 2; max-width: 680px; }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11px; font-weight: 600;
+  color: var(--purple);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.hero-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 6vw, 64px);
+  line-height: 1.08;
+  letter-spacing: -1px;
+  color: var(--white);
+  margin-bottom: 24px;
+}
+.hero-title em {
+  font-style: normal;
+  color: var(--purple);
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px);
+  color: rgba(163,113,247,0.65);
+  line-height: 1.75;
+  max-width: 460px;
+  margin: 0 auto 52px;
+  font-weight: 300;
+}
+
+/* ── FORM ── */
+.form-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 400px;
+  margin: 0 auto;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 60px rgba(124,58,237,0.1);
+}
+.form-label {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 16px;
+  color: var(--white); margin-bottom: 4px;
+}
+.form-sublabel {
+  font-size: 13px; color: rgba(163,113,247,0.6);
+  margin-bottom: 22px; line-height: 1.5;
+}
+.input-stack { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+
+.field {
+  width: 100%; padding: 13px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(163,113,247,0.2);
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; color: var(--white);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.field::placeholder { color: rgba(163,113,247,0.35); }
+.field:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(163,113,247,0.1);
+}
+
+.submit-btn {
+  width: 100%; padding: 14px;
+  background: var(--purple);
+  color: var(--white);
+  border: none; border-radius: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  letter-spacing: 0.01em;
+  box-shadow: 0 0 30px rgba(163,113,247,0.3);
+}
+.submit-btn:hover { background: #b68cf9; box-shadow: 0 0 40px rgba(163,113,247,0.45); }
+.submit-btn:active { transform: scale(0.98); }
+
+.form-note {
+  font-size: 11px; color: rgba(163,113,247,0.35);
+  text-align: center; margin-top: 12px;
+}
+
+.success-inner {
+  display: none; flex-direction: column;
+  align-items: center; gap: 12px; padding: 16px 0;
+}
+.success-circle {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(163,113,247,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  border: 1px solid var(--border);
+}
+.success-title { font-family:'Poppins',sans-serif; font-weight:700; font-size:16px; color:var(--white); }
+.success-sub { font-size:13px; color:rgba(163,113,247,0.6); text-align:center; line-height:1.6; }
+
+/* trust row */
+.trust-row {
+  display: flex; gap: 24px; align-items: center;
+  justify-content: center; flex-wrap: wrap;
+  margin-top: 28px;
+}
+.trust-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: rgba(163,113,247,0.45);
+}
+.trust-item span { font-size: 13px; }
+
+/* ── DIVIDER ── */
+.divider {
+  width: 100%; max-width: 800px; margin: 0 auto;
+  height: 0.5px; background: var(--border);
+}
+
+/* ── HOW ── */
+.section {
+  padding: 100px 24px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 64px;
+  max-width: 900px; margin: 0 auto;
+}
+.s-eyebrow {
+  font-size: 11px; font-weight: 600; color: var(--purple);
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.s-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; font-size: clamp(24px,4vw,36px);
+  color: var(--white); text-align: center;
+  letter-spacing: -0.4px; max-width: 560px;
+}
+.s-sub {
+  font-size: 15px; color: rgba(163,113,247,0.55);
+  text-align: center; line-height: 1.75; max-width: 420px;
+  font-weight: 300;
+}
+.s-header { display:flex; flex-direction:column; align-items:center; gap:12px; }
+
+/* steps */
+.steps { display: flex; flex-direction: column; gap: 0; width: 100%; max-width: 520px; }
+.step {
+  display: flex; gap: 24px;
+  padding: 28px 0;
+  border-bottom: 0.5px solid var(--border);
+  position: relative;
+}
+.step:last-child { border-bottom: none; }
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Poppins',sans-serif; font-weight: 700; font-size: 13px;
+  color: var(--purple);
+  background: rgba(163,113,247,0.06);
+}
+.step-body {}
+.step-title {
+  font-family: 'Poppins',sans-serif; font-weight: 700;
+  font-size: 15px; color: var(--white); margin-bottom: 5px;
+}
+.step-desc { font-size: 13px; color: rgba(163,113,247,0.55); line-height: 1.7; }
+
+/* ── FEATURES GRID ── */
+.features-wrap {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 820px;
+}
+.feat-card {
+  background: var(--card);
+  border: 0.5px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 20px;
+  transition: border-color 0.2s;
+}
+.feat-card:hover { border-color: rgba(163,113,247,0.35); }
+.feat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: rgba(163,113,247,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 14px;
+  border: 0.5px solid var(--border);
+}
+.feat-title { font-family:'Poppins',sans-serif; font-weight:700; font-size:14px; color:var(--white); margin-bottom:6px; }
+.feat-desc  { font-size:12px; color:rgba(163,113,247,0.5); line-height:1.65; }
+
+/* ── PHONE MOCKUP ── */
+.phone-section {
+  padding: 80px 24px 100px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 48px;
+  position: relative;
+}
+.phone-section::before {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 65%);
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+
+.phone {
+  width: 230px; height: 500px;
+  background: #050508;
+  border-radius: 36px;
+  border: 1px solid rgba(163,113,247,0.25);
+  box-shadow:
+    0 0 0 6px rgba(163,113,247,0.04),
+    0 40px 80px rgba(0,0,0,0.7),
+    0 0 60px rgba(124,58,237,0.15);
+  overflow: hidden;
+  position: relative; z-index: 2;
+}
+.phone-nb {
+  background: #000;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 7px 16px 4px;
+  font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.5);
+  position: relative;
+}
+.phone-notch {
+  width: 70px; height: 15px; background: #000;
+  border-radius: 0 0 10px 10px;
+  position: absolute; left: 50%; transform: translateX(-50%); top: 0;
+  border: 1px solid rgba(163,113,247,0.1);
+  border-top: none;
+}
+.pscreen { height: 462px; position: relative; overflow: hidden; }
+
+/* slides */
+.pslide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 20px 18px;
+  opacity: 0; transform: translateX(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+  background: #050508;
+}
+.pslide.active { opacity:1; transform:translateX(0); pointer-events:all; }
+.pslide.exit   { opacity:0; transform:translateX(-16px); }
+
+.ps-eye {
+  font-size: 9px; font-weight: 600; color: var(--purple);
+  letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px;
+}
+.ps-title {
+  font-family: 'Poppins',sans-serif; font-weight: 800;
+  font-size: 20px; color: var(--white);
+  line-height: 1.15; letter-spacing: -0.3px; margin-bottom: 4px;
+}
+.ps-title em { font-style:normal; color: var(--purple); }
+.ps-sub { font-size: 11px; color: rgba(163,113,247,0.5); line-height:1.5; margin-bottom:16px; }
+
+.ps-shield-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px;
+}
+.ps-ring {
+  width: 90px; height: 90px; border-radius: 50%;
+  border: 1px solid rgba(163,113,247,0.3);
+  display: flex; align-items: center; justify-content: center;
+  animation: pring 2.5s ease-in-out infinite;
+}
+@keyframes pring { 0%,100%{border-color:rgba(163,113,247,0.2)} 50%{border-color:rgba(163,113,247,0.6)} }
+.ps-inner {
+  width: 66px; height: 66px; border-radius: 50%;
+  background: rgba(163,113,247,0.1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.ps-badge {
+  background: rgba(163,113,247,0.1);
+  border: 0.5px solid var(--border);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 10px; font-weight: 600;
+  color: var(--purple); letter-spacing: 0.06em;
+}
+
+.ps-code-box {
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid var(--border);
+  border-radius: 10px; padding: 11px 13px; margin-bottom: 8px;
+}
+.ps-code {
+  font-family: 'SF Mono','Menlo',monospace;
+  font-size: 12px; color: var(--purple); line-height: 1.5;
+}
+.ps-check {
+  display: flex; align-items: center; gap: 5px; margin-bottom: 14px;
+}
+.ps-cdot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple); flex-shrink:0; }
+.ps-ctext { font-size: 10px; color: rgba(163,113,247,0.7); font-weight: 600; }
+.ps-btn {
+  background: var(--purple); color: var(--white);
+  border: none; border-radius: 10px;
+  padding: 11px; font-family: 'Poppins',sans-serif;
+  font-weight: 700; font-size: 12px; width: 100%;
+  text-align: center; cursor: pointer;
+}
+
+.ps-tcard {
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid var(--border);
+  border-radius: 12px; padding: 0 12px;
+}
+.ps-trow {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 0.5px solid rgba(163,113,247,0.08);
+}
+.ps-trow:last-child { border-bottom: none; }
+.ps-tleft { display: flex; align-items: center; gap: 8px; }
+.ps-ticon {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: rgba(163,113,247,0.1);
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+.ps-tlabel { font-size: 12px; font-weight: 600; color: var(--white); }
+.ps-tsub   { font-size: 10px; color: rgba(163,113,247,0.45); }
+.ps-tog {
+  width: 32px; height: 18px; border-radius: 9px;
+  background: var(--purple); position: relative; flex-shrink: 0;
+}
+.ps-tog::after {
+  content: ''; position: absolute;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #fff; top: 3px; right: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* alert slide */
+.pslide.alert-s { background: #0a0005; }
+.ps-aring {
+  width: 90px; height: 90px; border-radius: 50%;
+  background: rgba(231,76,60,0.08);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 12px;
+  animation: arp 1.4s ease-in-out infinite;
+  border: 0.5px solid rgba(231,76,60,0.2);
+}
+@keyframes arp { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+.ps-ainner {
+  width: 66px; height: 66px; border-radius: 50%;
+  background: rgba(231,76,60,0.15);
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  border: 0.5px solid rgba(231,76,60,0.3);
+}
+.ps-atitle {
+  font-family:'Poppins',sans-serif; font-weight:800; font-size:16px;
+  color: #ff6b6b; text-align:center; letter-spacing:0.04em; margin-bottom:14px;
+}
+.ps-aitem { display:flex; align-items:center; gap:7px; padding:8px 0; border-bottom:0.5px solid rgba(231,76,60,0.08); }
+.ps-aitem:last-child { border-bottom:none; }
+.ps-adot { width:5px; height:5px; border-radius:50%; background:#ff6b6b; flex-shrink:0; }
+.ps-atext { font-size:12px; color:rgba(255,107,107,0.7); font-weight:600; }
+
+/* progress */
+.phone-progress { display:flex; gap:5px; width:230px; }
+.pp-seg { height:2px; border-radius:1px; flex:1; background:rgba(163,113,247,0.12); overflow:hidden; }
+.pp-fill { height:100%; width:0%; background:var(--purple); border-radius:1px; }
+
+.phone-ctrls { display:flex; gap:10px; align-items:center; }
+.pc-btn {
+  background:rgba(163,113,247,0.08);
+  border:0.5px solid var(--border);
+  border-radius:50%; width:30px; height:30px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:var(--purple); font-size:12px;
+}
+.pc-btn:hover { background:rgba(163,113,247,0.15); }
+.pc-count { font-size:11px; color:rgba(163,113,247,0.4); min-width:32px; text-align:center; }
+
+/* ── FOOTER CTA ── */
+.fcta {
+  padding: 100px 24px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 28px;
+  text-align: center;
+  position: relative; overflow: hidden;
+}
+.fcta::before {
+  content:'';
+  position:absolute; width:600px; height:400px; border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.1) 0%,transparent 65%);
+  top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.fcta-title {
+  font-family:'Poppins',sans-serif; font-weight:900;
+  font-size:clamp(28px,5vw,48px); color:var(--white);
+  letter-spacing:-0.5px; max-width:500px; line-height:1.1;
+  position:relative;
+}
+.fcta-title em { font-style:normal; color:var(--purple); }
+.fcta-sub {
+  font-size:15px; color:rgba(163,113,247,0.5);
+  max-width:380px; line-height:1.75; font-weight:300;
+  position:relative;
+}
+.fcta-btn {
+  background:var(--purple); color:var(--white);
+  border:none; border-radius:14px; padding:15px 40px;
+  font-family:'Poppins',sans-serif; font-weight:700; font-size:15px;
+  cursor:pointer; transition:background 0.2s, transform 0.1s, box-shadow 0.2s;
+  box-shadow:0 0 40px rgba(163,113,247,0.3);
+  position:relative;
+}
+.fcta-btn:hover { background:#b68cf9; box-shadow:0 0 60px rgba(163,113,247,0.45); }
+.fcta-btn:active { transform:scale(0.98); }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 0.5px solid var(--border);
+  padding: 28px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+}
+.f-logo {
+  font-family:'Poppins',sans-serif; font-weight:800; font-size:15px;
+  color:rgba(255,255,255,0.2);
+}
+.f-note { font-size:11px; color:rgba(163,113,247,0.25); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-dot"></div>
+    UtilApp
+  </div>
+  <button class="nav-cta" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
+    Accedi in anteprima
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-content">
+    <div class="eyebrow">Sicurezza personale</div>
+
+    <h1 class="hero-title">
+      Se non puoi chiedere aiuto,<br>
+      <em>questa app lo fa per te.</em>
+    </h1>
+
+    <p class="hero-sub">
+      Attiva un protocollo di emergenza completo<br>
+      con una sola frase in codice.<br>
+      Nessuno sa che stai chiedendo aiuto.
+    </p>
+
+    <!-- FORM -->
+    <div class="form-card" id="waitlist">
+      <div id="form-content">
+        <div class="form-label">Accedi in anteprima</div>
+        <div class="form-sublabel">Posti limitati. Solo per i primi.</div>
+        <div class="input-stack">
+          <input class="field" type="text" id="fname" placeholder="Il tuo nome" autocomplete="name" />
+          <input class="field" type="email" id="femail" placeholder="La tua email" autocomplete="email" />
+        </div>
+        <button class="submit-btn" onclick="handleSubmit()">Entra nella lista →</button>
+        <div class="form-note">Nessuno spam. Solo l'accesso quando sei pronto.</div>
+      </div>
+      <div class="success-inner" id="success-box">
+        <div class="success-circle">✦</div>
+        <div class="success-title">Sei dentro.</div>
+        <div class="success-sub">Ti avvisiamo non appena l'anteprima è disponibile.</div>
+      </div>
+    </div>
+
+    <div class="trust-row">
+      <div class="trust-item"><span>🔒</span> Dati crittografati</div>
+      <div class="trust-item"><span>🇮🇹</span> Made in Italy</div>
+      <div class="trust-item"><span>⚡</span> Attivazione &lt;2 sec</div>
+    </div>
+  </div>
+</section>
+
+<div style="display:flex;justify-content:center;padding:0 24px;">
+  <div class="divider"></div>
+</div>
+
+<!-- PHONE MOCKUP -->
+<section class="phone-section">
+  <div class="s-header">
+    <div class="s-eyebrow">Come funziona</div>
+    <div class="s-title" style="text-align:center;font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(24px,4vw,36px);color:var(--white);">
+      Una parola può fare la differenza.
+    </div>
+    <div class="s-sub">Vedi il flusso completo — dalla configurazione all'allerta.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+    <div class="phone">
+      <div class="phone-nb">
+        <span>9:41</span>
+        <div class="phone-notch"></div>
+        <span>5G</span>
+      </div>
+      <div class="pscreen">
+
+        <!-- S0: HOME -->
+        <div class="pslide active" id="ps0">
+          <div class="ps-eye">UtilApp · Sistema</div>
+          <div class="ps-title">Modalità sicurezza<br><em>ATTIVA</em></div>
+          <div class="ps-shield-wrap">
+            <div class="ps-ring"><div class="ps-inner">🛡️</div></div>
+            <div class="ps-badge">PROTETTO</div>
+            <div style="font-size:11px;color:rgba(163,113,247,0.5);text-align:center;max-width:160px;line-height:1.5;">
+              Protezione discreta attiva.<br>Sistema in ascolto.
+            </div>
+          </div>
+        </div>
+
+        <!-- S1: FRASE -->
+        <div class="pslide" id="ps1">
+          <div class="ps-title" style="margin-bottom:3px;">Frase in codice</div>
+          <div class="ps-sub">Personalizza la tua parola chiave</div>
+          <div class="ps-code-box">
+            <div class="ps-code">"A casa c'è<br>la marmellata"</div>
+          </div>
+          <div class="ps-check">
+            <div class="ps-cdot"></div>
+            <span class="ps-ctext">Riconoscimento vocale attivo</span>
+          </div>
+          <div style="background:rgba(255,255,255,0.03);border:0.5px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:12px;">
+            <div style="font-size:9px;color:rgba(163,113,247,0.4);margin-bottom:3px;letter-spacing:0.05em;text-transform:uppercase;">Azione associata</div>
+            <div style="font-size:12px;color:var(--white);font-weight:600;">Chiama Mamma + Invia posizione</div>
+          </div>
+          <div class="ps-btn">Salva frase</div>
+        </div>
+
+        <!-- S2: AZIONI -->
+        <div class="pslide" id="ps2">
+          <div class="ps-title" style="margin-bottom:3px;">Azioni automatiche</div>
+          <div class="ps-sub">Attivate al riconoscimento frase</div>
+          <div class="ps-tcard">
+            <div class="ps-trow">
+              <div class="ps-tleft">
+                <div class="ps-ticon">📞</div>
+                <div><div class="ps-tlabel">Chiamata emergenza</div><div class="ps-tsub">Contatti fidati</div></div>
+              </div>
+              <div class="ps-tog"></div>
+            </div>
+            <div class="ps-trow">
+              <div class="ps-tleft">
+                <div class="ps-ticon">📍</div>
+                <div><div class="ps-tlabel">Invio posizione</div><div class="ps-tsub">GPS live</div></div>
+              </div>
+              <div class="ps-tog"></div>
+            </div>
+            <div class="ps-trow">
+              <div class="ps-tleft">
+                <div class="ps-ticon">🎙</div>
+                <div><div class="ps-tlabel">Registrazione</div><div class="ps-tsub">Audio nascosto</div></div>
+              </div>
+              <div class="ps-tog"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- S3: ALLERTA -->
+        <div class="pslide alert-s" id="ps3">
+          <div style="margin-top:16px;">
+            <div class="ps-aring"><div class="ps-ainner">🚨</div></div>
+            <div class="ps-atitle">ALLERTA ATTIVATA</div>
+            <div class="ps-aitem"><div class="ps-adot"></div><span class="ps-atext">Chiamata inviata</span></div>
+            <div class="ps-aitem"><div class="ps-adot"></div><span class="ps-atext">Posizione condivisa</span></div>
+            <div class="ps-aitem"><div class="ps-adot"></div><span class="ps-atext">Registrazione attiva</span></div>
+          </div>
+        </div>
+
+        <!-- S4: STATO -->
+        <div class="pslide" id="ps4">
+          <div class="ps-eye">UtilApp · Stato</div>
+          <div class="ps-shield-wrap">
+            <div class="ps-ring"><div class="ps-inner">✦</div></div>
+            <div class="ps-title" style="text-align:center;">Sistema attivo</div>
+            <div style="font-size:11px;color:rgba(163,113,247,0.5);text-align:center;max-width:160px;line-height:1.6;">
+              In caso di emergenza, la frase attiverà automaticamente l'aiuto.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="phone-progress">
+      <div class="pp-seg"><div class="pp-fill" id="pp0"></div></div>
+      <div class="pp-seg"><div class="pp-fill" id="pp1"></div></div>
+      <div class="pp-seg"><div class="pp-fill" id="pp2"></div></div>
+      <div class="pp-seg"><div class="pp-fill" id="pp3"></div></div>
+      <div class="pp-seg"><div class="pp-fill" id="pp4"></div></div>
+    </div>
+    <div class="phone-ctrls">
+      <button class="pc-btn" id="pc-prev">&#8592;</button>
+      <span class="pc-count" id="pc-count">1 / 5</span>
+      <button class="pc-btn" id="pc-next">&#8594;</button>
+    </div>
+  </div>
+</section>
+
+<div style="display:flex;justify-content:center;padding:0 24px;">
+  <div class="divider"></div>
+</div>
+
+<!-- FEATURES -->
+<section style="padding:100px 24px;display:flex;flex-direction:column;align-items:center;gap:48px;">
+  <div class="s-header">
+    <div class="s-eyebrow">Funzionalità</div>
+    <div class="s-title" style="font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(24px,4vw,34px);color:var(--white);text-align:center;">
+      Progettata per le situazioni più difficili
+    </div>
+  </div>
+  <div class="features-wrap">
+    <div class="feat-card">
+      <div class="feat-icon">🎙</div>
+      <div class="feat-title">Attivazione vocale</div>
+      <div class="feat-desc">Pronuncia la frase in codice. Il sistema si attiva in silenzio, senza toccare il telefono.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🔒</div>
+      <div class="feat-title">Interfaccia camuffata</div>
+      <div class="feat-desc">L'app appare come qualcosa di innocuo. Solo tu sai cosa si nasconde dentro.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📍</div>
+      <div class="feat-title">Posizione in tempo reale</div>
+      <div class="feat-desc">I tuoi contatti ricevono la tua posizione GPS aggiornata ogni 30 secondi.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🛡️</div>
+      <div class="feat-title">Crittografia avanzata</div>
+      <div class="feat-desc">Tutti i dati sono crittografati. Funziona anche offline. Tracce cancellabili.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<div style="display:flex;justify-content:center;padding:0 24px;">
+  <div class="divider"></div>
+</div>
+<section style="padding:100px 24px;display:flex;flex-direction:column;align-items:center;gap:48px;">
+  <div class="s-header">
+    <div class="s-eyebrow">Setup in 3 minuti</div>
+    <div class="s-title" style="font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(24px,4vw,34px);color:var(--white);text-align:center;">
+      Come si configura
+    </div>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Scegli la tua frase in codice</div>
+        <div class="step-desc">Qualcosa di naturale che potresti dire in qualsiasi conversazione. Es: "A casa c'è la marmellata".</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Configura i protocolli</div>
+        <div class="step-desc">Scegli cosa succede al riconoscimento: chiamata silenziosa, posizione GPS, registrazione audio.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">L'app lavora in silenzio</div>
+        <div class="step-desc">Invisibile in background. Quando serve, pronuncia la frase. Il resto lo fa UtilApp.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="fcta">
+  <div class="fcta-title">
+    Pronta ad averla<br><em>sul telefono?</em>
+  </div>
+  <div class="fcta-sub">
+    Unisciti alle prime persone a provare UtilApp.<br>
+    Posti limitati per l'anteprima.
+  </div>
+  <button class="fcta-btn" onclick="document.getElementById('waitlist').scrollIntoView({behavior:'smooth'})">
+    Accedi in anteprima →
+  </button>
+</section>
+
+<footer>
+  <div class="f-logo">UtilApp</div>
+  <div class="f-note">© 2025 UtilApp · Tutti i diritti riservati</div>
+</footer>
+
+<script>
+// FORM
+function handleSubmit() {
+  const name  = document.getElementById('fname').value.trim();
+  const email = document.getElementById('femail').value.trim();
+  if (!name || !email || !email.includes('@')) {
+    const fields = [document.getElementById('fname'), document.getElementById('femail')];
+    fields.forEach(f => { if (!f.value.trim()) { f.style.borderColor='rgba(231,76,60,0.5)'; setTimeout(()=>f.style.borderColor='',1500); }});
+    return;
+  }
+  document.getElementById('form-content').style.display = 'none';
+  const s = document.getElementById('success-box');
+  s.style.display = 'flex';
+}
+
+// PHONE SLIDESHOW
+const TOTAL = 5, DUR = 4200;
+let cur = 0, autoT = null, fillT = null;
+const slides = Array.from({length:TOTAL},(_,i)=>document.getElementById('ps'+i));
+const fills  = Array.from({length:TOTAL},(_,i)=>document.getElementById('pp'+i));
+const count  = document.getElementById('pc-count');
+
+function goTo(idx) {
+  if (idx < 0) idx = TOTAL-1;
+  if (idx >= TOTAL) idx = 0;
+  const prev = cur; cur = idx;
+  slides[prev].classList.remove('active');
+  slides[prev].classList.add('exit');
+  setTimeout(()=>slides[prev].classList.remove('exit'), 450);
+  slides[cur].classList.add('active');
+  count.textContent = (cur+1)+' / '+TOTAL;
+  fills.forEach((f,i)=>{ f.style.transition='none'; f.style.width=i<cur?'100%':'0%'; });
+  clearTimeout(fillT);
+  fillT = setTimeout(()=>{
+    fills[cur].style.transition='width '+DUR+'ms linear';
+    fills[cur].style.width='100%';
+  }, 60);
+  clearTimeout(autoT);
+  autoT = setTimeout(()=>goTo(cur+1), DUR);
+}
+
+document.getElementById('pc-next').addEventListener('click',()=>{
+  fills[cur].style.transition='none'; fills[cur].style.width='100%';
+  clearTimeout(autoT); goTo(cur+1);
+});
+document.getElementById('pc-prev').addEventListener('click',()=>{
+  fills[cur].style.transition='none'; fills[cur].style.width='0%';
+  clearTimeout(autoT); goTo(cur-1);
+});
+
+goTo(0);
+</script>
+</body>
+</html>
